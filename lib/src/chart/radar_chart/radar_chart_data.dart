@@ -1,5 +1,5 @@
 // coverage:ignore-file
-import 'dart:ui';
+import 'package:flutter/ui/ui.dart' hide TextStyle, Gradient;
 
 import 'package:equatable/equatable.dart';
 import 'package:fl_chart/fl_chart.dart';

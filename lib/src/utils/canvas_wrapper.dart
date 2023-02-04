@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/ui/ui.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/extensions/path_extension.dart';

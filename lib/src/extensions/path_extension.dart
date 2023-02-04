@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/ui/ui.dart';
 
 import 'package:fl_chart/src/utils/path_drawing/dash_path.dart';
 

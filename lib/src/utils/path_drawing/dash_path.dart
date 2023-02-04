@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/ui/ui.dart';
 
 /// Came from [flutter_path_drawing](https://github.com/dnfield/flutter_path_drawing) library.
 /// Creates a new path that is drawn from the segments of `source`.
@@ -26,7 +26,10 @@ Path dashPath(
     while (distance < metric.length) {
       final len = dashArray.next;
       if (draw) {
-        dest.addPath(metric.extractPath(distance, distance + len), Offset.zero);
+        final path = metric.extractPath(distance, distance + len);
+        if (path != null) {
+          dest.addPath(path, Offset.zero);
+        }
       }
       distance += len;
       draw = !draw;

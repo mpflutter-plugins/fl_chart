@@ -11,6 +11,31 @@ import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
+class MyTextPainter extends TextPainter {
+  MyTextPainter({
+    InlineSpan? text,
+    TextAlign textAlign = TextAlign.start,
+    TextDirection? textDirection,
+    double textScaleFactor = 1.0,
+  }) : super(
+            text: text,
+            textAlign: textAlign,
+            textDirection: textDirection,
+            textScaleFactor: textScaleFactor);
+
+  double get width {
+    return (text?.toPlainText().length ?? 0) * 6.8;
+  }
+
+  double get height {
+    return text?.style?.fontSize ?? 0.0;
+  }
+
+  Size get size {
+    return Size(width, height);
+  }
+}
+
 /// Paints [LineChartData] in the canvas, it can be used in a [CustomPainter]
 class LineChartPainter extends AxisChartPainter<LineChartData> {
   /// Paints [dataList] into canvas, it is the animating [LineChartData],
@@ -989,7 +1014,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData> {
         children: tooltipItem.children,
       );
 
-      final tp = TextPainter(
+      final tp = MyTextPainter(
         text: span,
         textAlign: tooltipItem.textAlign,
         textDirection: tooltipItem.textDirection,
@@ -1045,7 +1070,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData> {
       tooltipHeight,
     );
 
-    if (tooltipData.fitInsideHorizontally) {
+    if (tooltipData.fitInsideHorizontally || true) {
       if (rect.left < 0) {
         final shiftAmount = 0 - rect.left;
         rect = Rect.fromLTRB(
@@ -1067,7 +1092,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData> {
       }
     }
 
-    if (tooltipData.fitInsideVertically) {
+    if (tooltipData.fitInsideVertically || true) {
       if (rect.top < 0) {
         final shiftAmount = 0 - rect.top;
         rect = Rect.fromLTRB(
@@ -1148,7 +1173,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData> {
 
       final drawOffset = Offset(
         xOffset,
-        yOffset,
+        yOffset + tooltipData.tooltipPadding.vertical / 2.0,
       );
 
       canvasWrapper.drawRotated(

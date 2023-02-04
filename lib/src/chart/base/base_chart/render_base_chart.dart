@@ -19,11 +19,13 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
 
   // We use buildContext to retrieve Theme data
   BuildContext get buildContext => _buildContext;
+
   BuildContext _buildContext;
-  set buildContext(BuildContext value) {
-    _buildContext = value;
-    markNeedsPaint();
-  }
+
+  // set buildContext(BuildContext value) {
+  //   _buildContext = value;
+  //   markNeedsPaint();
+  // }
 
   void updateBaseTouchData(FlTouchData<R>? value) {
     _touchCallback = value?.touchCallback;
@@ -53,46 +55,46 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
     _panGestureRecognizer = PanGestureRecognizer();
     _panGestureRecognizer
       ..onDown = (dragDownDetails) {
-        _notifyTouchEvent(FlPanDownEvent(dragDownDetails));
+        notifyTouchEvent(FlPanDownEvent(dragDownDetails));
       }
       ..onStart = (dragStartDetails) {
-        _notifyTouchEvent(FlPanStartEvent(dragStartDetails));
+        notifyTouchEvent(FlPanStartEvent(dragStartDetails));
       }
       ..onUpdate = (dragUpdateDetails) {
-        _notifyTouchEvent(FlPanUpdateEvent(dragUpdateDetails));
+        notifyTouchEvent(FlPanUpdateEvent(dragUpdateDetails));
       }
       ..onCancel = () {
-        _notifyTouchEvent(FlPanCancelEvent());
+        notifyTouchEvent(FlPanCancelEvent());
       }
       ..onEnd = (dragEndDetails) {
-        _notifyTouchEvent(FlPanEndEvent(dragEndDetails));
+        notifyTouchEvent(FlPanEndEvent(dragEndDetails));
       };
 
     _tapGestureRecognizer = TapGestureRecognizer();
     _tapGestureRecognizer
       ..onTapDown = (tapDownDetails) {
-        _notifyTouchEvent(FlTapDownEvent(tapDownDetails));
+        notifyTouchEvent(FlTapDownEvent(tapDownDetails));
       }
       ..onTapCancel = () {
-        _notifyTouchEvent(FlTapCancelEvent());
+        notifyTouchEvent(FlTapCancelEvent());
       }
       ..onTapUp = (tapUpDetails) {
-        _notifyTouchEvent(FlTapUpEvent(tapUpDetails));
+        notifyTouchEvent(FlTapUpEvent(tapUpDetails));
       };
 
     _longPressGestureRecognizer =
         LongPressGestureRecognizer(duration: _longPressDuration);
     _longPressGestureRecognizer
       ..onLongPressStart = (longPressStartDetails) {
-        _notifyTouchEvent(FlLongPressStart(longPressStartDetails));
+        notifyTouchEvent(FlLongPressStart(longPressStartDetails));
       }
       ..onLongPressMoveUpdate = (longPressMoveUpdateDetails) {
-        _notifyTouchEvent(
+        notifyTouchEvent(
           FlLongPressMoveUpdate(longPressMoveUpdateDetails),
         );
       }
       ..onLongPressEnd = (longPressEndDetails) =>
-          _notifyTouchEvent(FlLongPressEnd(longPressEndDetails));
+          notifyTouchEvent(FlLongPressEnd(longPressEndDetails));
   }
 
   @override
@@ -126,25 +128,25 @@ abstract class RenderBaseChart<R extends BaseTouchResponse> extends RenderBox
       _tapGestureRecognizer.addPointer(event);
       _panGestureRecognizer.addPointer(event);
     } else if (event is PointerHoverEvent) {
-      _notifyTouchEvent(FlPointerHoverEvent(event));
+      notifyTouchEvent(FlPointerHoverEvent(event));
     }
   }
 
   /// Here we handle mouse hover enter event
   @override
   PointerEnterEventListener? get onEnter =>
-      (event) => _notifyTouchEvent(FlPointerEnterEvent(event));
+      (event) => notifyTouchEvent(FlPointerEnterEvent(event));
 
   /// Here we handle mouse hover exit event
   @override
   PointerExitEventListener? get onExit =>
-      (event) => _notifyTouchEvent(FlPointerExitEvent(event));
+      (event) => notifyTouchEvent(FlPointerExitEvent(event));
 
   /// Invokes the [_touchCallback] to notify listeners of this [FlTouchEvent]
   ///
   /// We get a [BaseTouchResponse] using [getResponseAtLocation] for events which contains a localPosition.
   /// Then we invoke [_touchCallback] using the [event] and [response].
-  void _notifyTouchEvent(FlTouchEvent event) {
+  void notifyTouchEvent(FlTouchEvent event) {
     if (_touchCallback == null) {
       return;
     }

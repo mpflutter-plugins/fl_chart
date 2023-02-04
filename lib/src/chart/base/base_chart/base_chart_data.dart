@@ -181,7 +181,7 @@ typedef BaseTouchCallback<R extends BaseTouchResponse> = void Function(
 /// It gives you the happened [FlTouchEvent] and existed [R] data at the event's location,
 /// then you should provide a [MouseCursor] to change the cursor at the event's location.
 /// For example you can pass the [SystemMouseCursors.click] to change the mouse cursor to click.
-typedef MouseCursorResolver<R extends BaseTouchResponse> = MouseCursor Function(
+typedef MouseCursorResolver<R extends BaseTouchResponse> = dynamic Function(
   FlTouchEvent,
   R?,
 );

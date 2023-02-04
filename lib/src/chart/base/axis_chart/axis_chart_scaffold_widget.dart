@@ -127,7 +127,9 @@ class AxisChartScaffoldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Stack(children: stackWidgets(constraints));
+        return Stack(
+          children: stackWidgets(constraints),
+        );
       },
     );
   }

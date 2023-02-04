@@ -4,6 +4,7 @@ import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/render_base_chart.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/src/rendering/mouse_tracking.dart';
 
 // coverage:ignore-start
 
@@ -106,4 +107,7 @@ class RenderBarChart extends RenderBaseChart<BarTouchResponse> {
     );
     return BarTouchResponse(touchedSpot);
   }
+
+  @override
+  PointerHoverEventListener? get onHover => throw UnimplementedError();
 }

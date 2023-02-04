@@ -5,11 +5,11 @@ import 'package:fl_chart/src/chart/line_chart/line_chart_painter.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/rendering/mouse_tracking.dart';
 
 // coverage:ignore-start
 
-/// Low level LineChart Widget.
-class LineChartLeaf extends LeafRenderObjectWidget {
+class LineChartLeaf extends StatelessWidget {
   const LineChartLeaf({
     super.key,
     required this.data,
@@ -20,22 +20,87 @@ class LineChartLeaf extends LeafRenderObjectWidget {
   final LineChartData targetData;
 
   @override
-  RenderLineChart createRenderObject(BuildContext context) => RenderLineChart(
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: ((context, constraints) {
+      final renderChart = RenderLineChart(
         context,
         data,
         targetData,
         MediaQuery.of(context).textScaleFactor,
+      )..mockTestSize = Size(constraints.maxWidth, constraints.maxHeight);
+      final painter = RenderLineChartPainter(renderChart);
+      return GestureDetector(
+        onPanDown: (details) {
+          renderChart.notifyTouchEvent(FlPanDownEvent(details));
+        },
+        onPanStart: (details) {
+          renderChart.notifyTouchEvent(FlPanStartEvent(details));
+        },
+        onPanUpdate: (details) {
+          renderChart.notifyTouchEvent(FlPanUpdateEvent(details));
+        },
+        onPanEnd: (details) {
+          renderChart.notifyTouchEvent(FlPanEndEvent(details));
+        },
+        onPanCancel: () {
+          renderChart.notifyTouchEvent(FlPanCancelEvent());
+        },
+        child: Container(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: CustomPaint(
+            painter: painter,
+          ),
+        ),
       );
-
-  @override
-  void updateRenderObject(BuildContext context, RenderLineChart renderObject) {
-    renderObject
-      ..data = data
-      ..targetData = targetData
-      ..textScale = MediaQuery.of(context).textScaleFactor
-      ..buildContext = context;
+    }));
   }
 }
+
+class RenderLineChartPainter extends CustomPainter {
+  final RenderLineChart render;
+
+  RenderLineChartPainter(this.render);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    render.paint2(canvas, Offset.zero);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+/// Low level LineChart Widget.
+// class LineChartLeaf extends LeafRenderObjectWidget {
+//   const LineChartLeaf({
+//     super.key,
+//     required this.data,
+//     required this.targetData,
+//   });
+
+//   final LineChartData data;
+//   final LineChartData targetData;
+
+//   @override
+//   RenderLineChart createRenderObject(BuildContext context) => RenderLineChart(
+//         context,
+//         data,
+//         targetData,
+//         MediaQuery.of(context).textScaleFactor,
+//       );
+
+//   @override
+//   void updateRenderObject(BuildContext context, RenderLineChart renderObject) {
+//     renderObject
+//       ..data = data
+//       ..targetData = targetData
+//       ..textScale = MediaQuery.of(context).textScaleFactor
+//       ..buildContext = context;
+//   }
+// }
 // coverage:ignore-end
 
 /// Renders our LineChart, also handles hitTest.
@@ -102,6 +167,18 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
     canvas.restore();
   }
 
+  void paint2(Canvas canvas2, Offset offset) {
+    final canvas = canvas2
+      ..save()
+      ..translate(offset.dx, offset.dy);
+    painter.paint(
+      buildContext,
+      CanvasWrapper(canvas, mockTestSize ?? size),
+      paintHolder,
+    );
+    canvas.restore();
+  }
+
   @override
   LineTouchResponse getResponseAtLocation(Offset localPosition) {
     final touchedSpots = painter.handleTouch(
@@ -111,4 +188,8 @@ class RenderLineChart extends RenderBaseChart<LineTouchResponse> {
     );
     return LineTouchResponse(touchedSpots);
   }
+
+  @override
+  // TODO: implement onHover
+  PointerHoverEventListener? get onHover => throw UnimplementedError();
 }
