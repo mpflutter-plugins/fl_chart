@@ -3,6 +3,7 @@ import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/chart/scatter_chart/scatter_chart_data.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
+import 'package:fl_chart/src/utils/mock_text_painter.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -135,7 +136,7 @@ class ScatterChartPainter extends AxisChartPainter<ScatterChartData> {
           ),
         );
 
-        final tp = TextPainter(
+        final tp = FLTextPainter(
           text: span,
           textAlign: TextAlign.center,
           textDirection: holder.data.scatterLabelSettings.textDirection,
@@ -230,7 +231,7 @@ class ScatterChartPainter extends AxisChartPainter<ScatterChartData> {
       children: tooltipItem.children,
     );
 
-    final drawingTextPainter = TextPainter(
+    final drawingTextPainter = FLTextPainter(
       text: span,
       textAlign: tooltipItem.textAlign,
       textDirection: tooltipItem.textDirection,
@@ -262,7 +263,7 @@ class ScatterChartPainter extends AxisChartPainter<ScatterChartData> {
       tooltipHeight,
     );
 
-    if (tooltipData.fitInsideHorizontally) {
+    if (tooltipData.fitInsideHorizontally || true) {
       if (rect.left < 0) {
         final shiftAmount = 0 - rect.left;
         rect = Rect.fromLTRB(
@@ -284,7 +285,7 @@ class ScatterChartPainter extends AxisChartPainter<ScatterChartData> {
       }
     }
 
-    if (tooltipData.fitInsideVertically) {
+    if (tooltipData.fitInsideVertically || true) {
       if (rect.top < 0) {
         final shiftAmount = 0 - rect.top;
         rect = Rect.fromLTRB(

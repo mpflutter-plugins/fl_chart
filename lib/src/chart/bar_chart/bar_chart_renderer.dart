@@ -8,30 +8,90 @@ import 'package:flutter/src/rendering/mouse_tracking.dart';
 
 // coverage:ignore-start
 
-/// Low level BarChart Widget.
-class BarChartLeaf extends LeafRenderObjectWidget {
+class BarChartLeaf extends StatelessWidget {
   const BarChartLeaf({super.key, required this.data, required this.targetData});
 
   final BarChartData data;
   final BarChartData targetData;
 
   @override
-  RenderBarChart createRenderObject(BuildContext context) => RenderBarChart(
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: ((context, constraints) {
+      final renderChart = RenderBarChart(
         context,
         data,
         targetData,
         MediaQuery.of(context).textScaleFactor,
+      )..mockTestSize = Size(constraints.maxWidth, constraints.maxHeight);
+      final painter = RenderBarChartPainter(renderChart);
+      return GestureDetector(
+        onPanDown: (details) {
+          renderChart.notifyTouchEvent(FlPanDownEvent(details));
+        },
+        onPanStart: (details) {
+          renderChart.notifyTouchEvent(FlPanStartEvent(details));
+        },
+        onPanUpdate: (details) {
+          renderChart.notifyTouchEvent(FlPanUpdateEvent(details));
+        },
+        onPanEnd: (details) {
+          renderChart.notifyTouchEvent(FlPanEndEvent(details));
+        },
+        onPanCancel: () {
+          renderChart.notifyTouchEvent(FlPanCancelEvent());
+        },
+        child: Container(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: CustomPaint(
+            painter: painter,
+          ),
+        ),
       );
-
-  @override
-  void updateRenderObject(BuildContext context, RenderBarChart renderObject) {
-    renderObject
-      ..data = data
-      ..targetData = targetData
-      ..textScale = MediaQuery.of(context).textScaleFactor
-      ..buildContext = context;
+    }));
   }
 }
+
+class RenderBarChartPainter extends CustomPainter {
+  final RenderBarChart render;
+
+  RenderBarChartPainter(this.render);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    render.paint2(canvas, Offset.zero);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+/// Low level BarChart Widget.
+// class BarChartLeaf extends LeafRenderObjectWidget {
+//   const BarChartLeaf({super.key, required this.data, required this.targetData});
+
+//   final BarChartData data;
+//   final BarChartData targetData;
+
+//   @override
+//   RenderBarChart createRenderObject(BuildContext context) => RenderBarChart(
+//         context,
+//         data,
+//         targetData,
+//         MediaQuery.of(context).textScaleFactor,
+//       );
+
+//   @override
+//   void updateRenderObject(BuildContext context, RenderBarChart renderObject) {
+//     renderObject
+//       ..data = data
+//       ..targetData = targetData
+//       ..textScale = MediaQuery.of(context).textScaleFactor
+//       ..buildContext = context;
+//   }
+// }
 // coverage:ignore-end
 
 /// Renders our BarChart, also handles hitTest.
@@ -88,6 +148,18 @@ class RenderBarChart extends RenderBaseChart<BarTouchResponse> {
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas
+      ..save()
+      ..translate(offset.dx, offset.dy);
+    painter.paint(
+      buildContext,
+      CanvasWrapper(canvas, mockTestSize ?? size),
+      paintHolder,
+    );
+    canvas.restore();
+  }
+
+  void paint2(Canvas canvas2, Offset offset) {
+    final canvas = canvas2
       ..save()
       ..translate(offset.dx, offset.dy);
     painter.paint(

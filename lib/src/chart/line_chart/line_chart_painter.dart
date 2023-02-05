@@ -8,33 +8,9 @@ import 'package:fl_chart/src/extensions/paint_extension.dart';
 import 'package:fl_chart/src/extensions/path_extension.dart';
 import 'package:fl_chart/src/extensions/text_align_extension.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
+import 'package:fl_chart/src/utils/mock_text_painter.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
-
-class MyTextPainter extends TextPainter {
-  MyTextPainter({
-    InlineSpan? text,
-    TextAlign textAlign = TextAlign.start,
-    TextDirection? textDirection,
-    double textScaleFactor = 1.0,
-  }) : super(
-            text: text,
-            textAlign: textAlign,
-            textDirection: textDirection,
-            textScaleFactor: textScaleFactor);
-
-  double get width {
-    return (text?.toPlainText().length ?? 0) * 6.8;
-  }
-
-  double get height {
-    return text?.style?.fontSize ?? 0.0;
-  }
-
-  Size get size {
-    return Size(width, height);
-  }
-}
 
 /// Paints [LineChartData] in the canvas, it can be used in a [CustomPainter]
 class LineChartPainter extends AxisChartPainter<LineChartData> {
@@ -1014,7 +990,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData> {
         children: tooltipItem.children,
       );
 
-      final tp = MyTextPainter(
+      final tp = FLTextPainter(
         text: span,
         textAlign: tooltipItem.textAlign,
         textDirection: tooltipItem.textDirection,

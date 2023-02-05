@@ -3,6 +3,7 @@ import 'dart:math' show pi, cos, sin, min;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
+import 'package:fl_chart/src/utils/mock_text_painter.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -30,8 +31,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
     _graphPaint = Paint();
     _graphBorderPaint = Paint();
     _graphPointPaint = Paint();
-    _ticksTextPaint = TextPainter();
-    _titleTextPaint = TextPainter();
+    _ticksTextPaint = FLTextPainter();
+    _titleTextPaint = FLTextPainter();
   }
   late Paint _borderPaint;
   late Paint _backgroundPaint;
@@ -61,6 +62,8 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
     }
 
     dataSetsPosition = calculateDataSetsPosition(canvasWrapper.size, holder);
+
+    canvasWrapper.translate(0.0, 20.0);
 
     drawGrids(canvasWrapper, holder);
     drawTicks(context, canvasWrapper, holder);

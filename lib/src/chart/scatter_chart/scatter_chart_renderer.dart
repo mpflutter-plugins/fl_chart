@@ -6,40 +6,101 @@ import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/rendering/mouse_tracking.dart';
 
-// coverage:ignore-start
-
-/// Low level ScatterChart Widget.
-class ScatterChartLeaf extends LeafRenderObjectWidget {
-  const ScatterChartLeaf({
-    super.key,
-    required this.data,
-    required this.targetData,
-  });
+class ScatterChartLeaf extends StatelessWidget {
+  const ScatterChartLeaf(
+      {super.key, required this.data, required this.targetData});
 
   final ScatterChartData data;
   final ScatterChartData targetData;
 
   @override
-  RenderScatterChart createRenderObject(BuildContext context) =>
-      RenderScatterChart(
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: ((context, constraints) {
+      final renderChart = RenderScatterChart(
         context,
         data,
         targetData,
         MediaQuery.of(context).textScaleFactor,
+      )..mockTestSize = Size(constraints.maxWidth, constraints.maxHeight);
+      final painter = RenderScatterChartPainter(renderChart);
+      return GestureDetector(
+        onPanDown: (details) {
+          renderChart.notifyTouchEvent(FlPanDownEvent(details));
+        },
+        onPanStart: (details) {
+          renderChart.notifyTouchEvent(FlPanStartEvent(details));
+        },
+        onPanUpdate: (details) {
+          renderChart.notifyTouchEvent(FlPanUpdateEvent(details));
+        },
+        onPanEnd: (details) {
+          renderChart.notifyTouchEvent(FlPanEndEvent(details));
+        },
+        onPanCancel: () {
+          renderChart.notifyTouchEvent(FlPanCancelEvent());
+        },
+        child: Container(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: CustomPaint(
+            painter: painter,
+          ),
+        ),
       );
-
-  @override
-  void updateRenderObject(
-    BuildContext context,
-    RenderScatterChart renderObject,
-  ) {
-    renderObject
-      ..data = data
-      ..targetData = targetData
-      ..textScale = MediaQuery.of(context).textScaleFactor
-      ..buildContext = context;
+    }));
   }
 }
+
+class RenderScatterChartPainter extends CustomPainter {
+  final RenderScatterChart render;
+
+  RenderScatterChartPainter(this.render);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    render.paint2(canvas, Offset.zero);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+// coverage:ignore-start
+
+/// Low level ScatterChart Widget.
+// class ScatterChartLeaf extends LeafRenderObjectWidget {
+//   const ScatterChartLeaf({
+//     super.key,
+//     required this.data,
+//     required this.targetData,
+//   });
+
+//   final ScatterChartData data;
+//   final ScatterChartData targetData;
+
+//   @override
+//   RenderScatterChart createRenderObject(BuildContext context) =>
+//       RenderScatterChart(
+//         context,
+//         data,
+//         targetData,
+//         MediaQuery.of(context).textScaleFactor,
+//       );
+
+//   @override
+//   void updateRenderObject(
+//     BuildContext context,
+//     RenderScatterChart renderObject,
+//   ) {
+//     renderObject
+//       ..data = data
+//       ..targetData = targetData
+//       ..textScale = MediaQuery.of(context).textScaleFactor
+//       ..buildContext = context;
+//   }
+// }
 // coverage:ignore-end
 
 /// Renders our ScatterChart, also handles hitTest.
@@ -96,6 +157,18 @@ class RenderScatterChart extends RenderBaseChart<ScatterTouchResponse> {
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas
+      ..save()
+      ..translate(offset.dx, offset.dy);
+    painter.paint(
+      buildContext,
+      CanvasWrapper(canvas, mockTestSize ?? size),
+      paintHolder,
+    );
+    canvas.restore();
+  }
+
+  void paint2(Canvas canvas2, Offset offset) {
+    final canvas = canvas2
       ..save()
       ..translate(offset.dx, offset.dy);
     painter.paint(

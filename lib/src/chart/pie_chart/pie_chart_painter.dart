@@ -5,6 +5,7 @@ import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/line.dart';
 import 'package:fl_chart/src/chart/pie_chart/pie_chart_data.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
+import 'package:fl_chart/src/utils/mock_text_painter.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -197,19 +198,29 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
         Line(startLineFrom, startLineTo),
         sectionSpace,
       );
-      sectionPath = Path.combine(
-        PathOperation.difference,
-        sectionPath,
-        startLineSeparatorPath,
-      );
+      sectionPath = Path.from(sectionPath)
+        ..addPath(
+          startLineSeparatorPath,
+          Offset.zero,
+        );
+      // sectionPath = Path.combine(
+      //   PathOperation.difference,
+      //   sectionPath,
+      //   startLineSeparatorPath,
+      // );
 
       final endLineSeparatorPath =
           createRectPathAroundLine(Line(endLineFrom, endLineTo), sectionSpace);
-      sectionPath = Path.combine(
-        PathOperation.difference,
-        sectionPath,
-        endLineSeparatorPath,
-      );
+      sectionPath = Path.from(sectionPath)
+        ..addPath(
+          endLineSeparatorPath,
+          Offset.zero,
+        );
+      // sectionPath = Path.combine(
+      //   PathOperation.difference,
+      //   sectionPath,
+      //   endLineSeparatorPath,
+      // );
     }
 
     return sectionPath;
@@ -340,7 +351,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
           style: Utils().getThemeAwareTextStyle(context, section.titleStyle),
           text: section.title,
         );
-        final tp = TextPainter(
+        final tp = FLTextPainter(
           text: span,
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
@@ -349,7 +360,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
 
         canvasWrapper.drawText(
           tp,
-          sectionCenterOffsetTitle - Offset(tp.width / 2, tp.height / 2),
+          sectionCenterOffsetTitle - Offset(tp.width / 1.5, 0),
         );
       }
 

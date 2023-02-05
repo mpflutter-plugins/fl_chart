@@ -1,43 +1,101 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/render_base_chart.dart';
-import 'package:fl_chart/src/chart/pie_chart/pie_chart_helper.dart';
 import 'package:fl_chart/src/chart/pie_chart/pie_chart_painter.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 
-// coverage:ignore-start
-
-/// Low level PieChart Widget.
-class PieChartLeaf extends MultiChildRenderObjectWidget {
-  PieChartLeaf({
-    super.key,
-    required this.data,
-    required this.targetData,
-  }) : super(children: targetData.sections.toWidgets());
+class PieChartLeaf extends StatelessWidget {
+  const PieChartLeaf({super.key, required this.data, required this.targetData});
 
   final PieChartData data;
   final PieChartData targetData;
 
   @override
-  RenderPieChart createRenderObject(BuildContext context) => RenderPieChart(
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: ((context, constraints) {
+      final renderChart = RenderPieChart(
         context,
         data,
         targetData,
         MediaQuery.of(context).textScaleFactor,
+      )..mockTestSize = Size(constraints.maxWidth, constraints.maxHeight);
+      final painter = RenderPieChartPainter(renderChart);
+      return GestureDetector(
+        onPanDown: (details) {
+          renderChart.notifyTouchEvent(FlPanDownEvent(details));
+        },
+        onPanStart: (details) {
+          renderChart.notifyTouchEvent(FlPanStartEvent(details));
+        },
+        onPanUpdate: (details) {
+          renderChart.notifyTouchEvent(FlPanUpdateEvent(details));
+        },
+        onPanEnd: (details) {
+          renderChart.notifyTouchEvent(FlPanEndEvent(details));
+        },
+        onPanCancel: () {
+          renderChart.notifyTouchEvent(FlPanCancelEvent());
+        },
+        child: Container(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: CustomPaint(
+            painter: painter,
+          ),
+        ),
       );
-
-  @override
-  void updateRenderObject(BuildContext context, RenderPieChart renderObject) {
-    renderObject
-      ..data = data
-      ..targetData = targetData
-      ..textScale = MediaQuery.of(context).textScaleFactor
-      ..buildContext = context;
+    }));
   }
 }
+
+class RenderPieChartPainter extends CustomPainter {
+  final RenderPieChart render;
+
+  RenderPieChartPainter(this.render);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    render.paint2(canvas, Offset.zero);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+// coverage:ignore-start
+
+/// Low level PieChart Widget.
+// class PieChartLeaf extends MultiChildRenderObjectWidget {
+//   PieChartLeaf({
+//     super.key,
+//     required this.data,
+//     required this.targetData,
+//   }) : super(children: targetData.sections.toWidgets());
+
+//   final PieChartData data;
+//   final PieChartData targetData;
+
+//   @override
+//   RenderPieChart createRenderObject(BuildContext context) => RenderPieChart(
+//         context,
+//         data,
+//         targetData,
+//         MediaQuery.of(context).textScaleFactor,
+//       );
+
+//   @override
+//   void updateRenderObject(BuildContext context, RenderPieChart renderObject) {
+//     renderObject
+//       ..data = data
+//       ..targetData = targetData
+//       ..textScale = MediaQuery.of(context).textScaleFactor
+//       ..buildContext = context;
+//   }
+// }
 // coverage:ignore-end
 
 /// Renders our PieChart, also handles hitTest.
@@ -146,6 +204,18 @@ class RenderPieChart extends RenderBaseChart<PieTouchResponse>
     );
     canvas.restore();
     defaultPaint(context, offset);
+  }
+
+  void paint2(Canvas canvas2, Offset offset) {
+    final canvas = canvas2
+      ..save()
+      ..translate(offset.dx, offset.dy);
+    painter.paint(
+      buildContext,
+      CanvasWrapper(canvas, mockTestSize ?? size),
+      paintHolder,
+    );
+    canvas.restore();
   }
 
   @override

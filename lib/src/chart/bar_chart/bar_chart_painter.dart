@@ -8,6 +8,7 @@ import 'package:fl_chart/src/extensions/bar_chart_data_extension.dart';
 import 'package:fl_chart/src/extensions/paint_extension.dart';
 import 'package:fl_chart/src/extensions/rrect_extension.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
+import 'package:fl_chart/src/utils/mock_text_painter.dart';
 import 'package:fl_chart/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -350,7 +351,7 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
       children: tooltipItem.children,
     );
 
-    final tp = TextPainter(
+    final tp = FLTextPainter(
       text: span,
       textAlign: tooltipItem.textAlign,
       textDirection: tooltipItem.textDirection,
@@ -400,7 +401,7 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
       tooltipHeight,
     );
 
-    if (tooltipData.fitInsideHorizontally) {
+    if (tooltipData.fitInsideHorizontally || true) {
       if (rect.left < 0) {
         final shiftAmount = 0 - rect.left;
         rect = Rect.fromLTRB(
@@ -422,7 +423,7 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
       }
     }
 
-    if (tooltipData.fitInsideVertically) {
+    if (tooltipData.fitInsideVertically || true) {
       if (rect.top < 0) {
         final shiftAmount = 0 - rect.top;
         rect = Rect.fromLTRB(
